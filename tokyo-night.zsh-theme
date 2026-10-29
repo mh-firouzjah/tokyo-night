@@ -10,8 +10,9 @@ _tokyo_night_c=(
   branch    '#bb9af7'
   muted     '#a9b1d6'
   indexed   '#9ece6a'
-  unindexed '#f7768e'
-  untracked '#f7768e'
+  unindexed '#e0af68'
+  untracked '#ff9e64'
+  status_red '#f7768e'
   alert     '#f7768e'
   sync      '#bb9af7'
   stash     '#7aa2f7'
@@ -34,29 +35,38 @@ zstyle ':zim:duration-info' format "${_tokyo_night_sp}%F{${_tokyo_night_c[durati
 add-zsh-hook preexec duration-info-preexec
 add-zsh-hook precmd duration-info-precmd
 
-if [[ ${TOKYO_NIGHT_GIT_VERBOSE:-1} == 0 ]]; then
-  zstyle ':zim:git-info' verbose no
-  zstyle ':zim:git-info:indexed' format "${_tokyo_night_sp}%F{${_tokyo_night_c[indexed]}}+%f"
-  zstyle ':zim:git-info:unindexed' format "${_tokyo_night_sp}%F{${_tokyo_night_c[unindexed]}}!%f"
-  zstyle ':zim:git-info:keys' format 'prompt' "${_tokyo_night_sp}%b%c%i%I%s%A%B%S"
-else
-  # Mirror Git's default status-color semantics: staged changes are green;
-  # unstaged changes, untracked files, and conflicts are red.
+if [[ ${TOKYO_NIGHT_GIT_DETAIL:-0} == 1 ]]; then
+  # Opt-in detailed status. Staged states are green; unstaged, untracked,
+  # and conflicted states are red, following Git's default color semantics.
   zstyle ':zim:git-info' verbose yes
   zstyle ':zim:git-info:index-added' format "${_tokyo_night_sp}%F{${_tokyo_night_c[indexed]}}+A%a%f"
   zstyle ':zim:git-info:index-deleted' format "${_tokyo_night_sp}%F{${_tokyo_night_c[indexed]}}+D%x%f"
   zstyle ':zim:git-info:index-renamed' format "${_tokyo_night_sp}%F{${_tokyo_night_c[indexed]}}+R%r%f"
   zstyle ':zim:git-info:index-modified' format "${_tokyo_night_sp}%F{${_tokyo_night_c[indexed]}}+M%m%f"
-  zstyle ':zim:git-info:work-deleted' format "${_tokyo_night_sp}%F{${_tokyo_night_c[unindexed]}}!D%X%f"
-  zstyle ':zim:git-info:work-modified' format "${_tokyo_night_sp}%F{${_tokyo_night_c[unindexed]}}!M%M%f"
+  zstyle ':zim:git-info:work-deleted' format "${_tokyo_night_sp}%F{${_tokyo_night_c[status_red]}}!D%X%f"
+  zstyle ':zim:git-info:work-modified' format "${_tokyo_night_sp}%F{${_tokyo_night_c[status_red]}}!M%M%f"
+  zstyle ':zim:git-info:untracked' format "${_tokyo_night_sp}%F{${_tokyo_night_c[status_red]}}?%u%f"
+  zstyle ':zim:git-info:unmerged' format "${_tokyo_night_sp}%F{${_tokyo_night_c[status_red]}}~%U%f"
   zstyle ':zim:git-info:keys' format 'prompt' "${_tokyo_night_sp}%b%c%a%x%r%m%X%M%u%U%s%A%B%S"
+else
+  # Preserve the original compact prompt unless detailed mode is requested.
+  if [[ ${TOKYO_NIGHT_GIT_VERBOSE:-1} == 0 ]]; then
+    zstyle ':zim:git-info' verbose no
+    zstyle ':zim:git-info:indexed' format "${_tokyo_night_sp}%F{${_tokyo_night_c[indexed]}}+%f"
+    zstyle ':zim:git-info:unindexed' format "${_tokyo_night_sp}%F{${_tokyo_night_c[unindexed]}}!%f"
+  else
+    zstyle ':zim:git-info' verbose yes
+    zstyle ':zim:git-info:indexed' format "${_tokyo_night_sp}%F{${_tokyo_night_c[indexed]}}+%i%f"
+    zstyle ':zim:git-info:unindexed' format "${_tokyo_night_sp}%F{${_tokyo_night_c[unindexed]}}!%I%f"
+  fi
+  zstyle ':zim:git-info:untracked' format "${_tokyo_night_sp}%F{${_tokyo_night_c[untracked]}}?%u%f"
+  zstyle ':zim:git-info:unmerged' format "${_tokyo_night_sp}%F{${_tokyo_night_c[alert]}}~%U%f"
+  zstyle ':zim:git-info:keys' format 'prompt' "${_tokyo_night_sp}%b%c%i%I%u%U%s%A%B%S"
 fi
 
 zstyle ':zim:git-info' ignore-submodules all
 zstyle ':zim:git-info:branch' format "%F{${_tokyo_night_c[branch]}}%b%f"
 zstyle ':zim:git-info:commit' format "%F{${_tokyo_night_c[muted]}}@%c%f"
-zstyle ':zim:git-info:untracked' format "${_tokyo_night_sp}%F{${_tokyo_night_c[untracked]}}?%u%f"
-zstyle ':zim:git-info:unmerged' format "${_tokyo_night_sp}%F{${_tokyo_night_c[alert]}}~%U%f"
 zstyle ':zim:git-info:action' format "${_tokyo_night_sp}%F{${_tokyo_night_c[branch]}}%s%f"
 zstyle ':zim:git-info:ahead' format "${_tokyo_night_sp}%F{${_tokyo_night_c[sync]}}⇡%A%f"
 zstyle ':zim:git-info:behind' format "${_tokyo_night_sp}%F{${_tokyo_night_c[sync]}}⇣%B%f"
@@ -77,7 +87,7 @@ add-zsh-hook precmd _tokyo_night_prompt_data
 
 PS1='%F{${_tokyo_night_c[path]}}${TOKYO_NIGHT_DISTRO_SYMBOL}%f'
 PS1+='${_tokyo_night_sp}%F{${_tokyo_night_c[path]}}%B${_tokyo_night_path}%b%f${(e)git_info[prompt]}${_tokyo_night_venv}${duration_info}'
-PS1+='%(?..${_tokyo_night_sp}%F{${_tokyo_night_c[alert]}}✘%?%f)'
-PS1+='${_tokyo_night_sp}%(!.%F{${_tokyo_night_c[alert]}}⮞#.%(?.%F{${_tokyo_night_c[success]}}⮞.%F{${_tokyo_night_c[alert]}}⮞))%f${_tokyo_night_sp}'
+PS1+='%(?.. ${_tokyo_night_sp}%F{${_tokyo_night_c[alert]}}✘%?%f)'
+PS1+=' ${_tokyo_night_sp}%(!.%F{${_tokyo_night_c[alert]}}⮞#.%(?.%F{${_tokyo_night_c[success]}}⮞.%F{${_tokyo_night_c[alert]}}⮞))%f${_tokyo_night_sp}'
 PS2='%_ > '
 unset RPS1 RPROMPT
