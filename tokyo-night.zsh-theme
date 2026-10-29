@@ -77,7 +77,7 @@ add-zsh-hook precmd _tokyo_night_prompt_data
 
 PS1='%F{${_tokyo_night_c[path]}}${TOKYO_NIGHT_DISTRO_SYMBOL}%f'
 PS1+='${_tokyo_night_sp}%F{${_tokyo_night_c[path]}}%B${_tokyo_night_path}%b%f${(e)git_info[prompt]}${_tokyo_night_venv}${duration_info}'
-PS1+='%(?.. ${_tokyo_night_sp}%F{${_tokyo_night_c[alert]}}✘%?%f)'
-PS1+=' ${_tokyo_night_sp}%(!.%F{${_tokyo_night_c[alert]}}⮞#.%(?.%F{${_tokyo_night_c[success]}}⮞.%F{${_tokyo_night_c[alert]}}⮞))%f${_tokyo_night_sp}'
+PS1+='%(?..${_tokyo_night_sp}%F{${_tokyo_night_c[alert]}}✘%?%f)'
+PS1+='${_tokyo_night_sp}%(!.%F{${_tokyo_night_c[alert]}}⮞#.%(?.%F{${_tokyo_night_c[success]}}⮞.%F{${_tokyo_night_c[alert]}}⮞))%f${_tokyo_night_sp}'
 PS2='%_ > '
 unset RPS1 RPROMPT
